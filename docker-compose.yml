@@ -22,24 +22,31 @@ services:
     environment:
       # ---- 必須 ----
       START_MODE: "1"              # 1=通常起動, 4=shell起動（メンテ用）
-      VERSION: "stable"            # 7DTD本体バージョン（stable=1.4想定）
+      # 7DTD本体のSteamブランチ。
+      # 注意: "stable"/"public" は常に最新安定版（現在は2.6）を指すため、
+      # DF V6（1.4専用）を使う場合は必ず "v1.4" を指定してバージョン固定する。
+      # 他のブランチ名は https://api.steamcmd.net/v1/info/251570 で確認可能。
+      VERSION: "v1.4"
       PUID: "1000"
       PGID: "1000"
       TimeZone: "Asia/Tokyo"
 
-      # ---- Darkness Falls ----
-      DARKNESS_FALLS: "YES"        # DFを自動インストール
+      # ---- Darkness Falls (v6)----
+      UPDATE_MODS: "NO"            # XXX_UPDATE=YES のMODを更新する場合 YES
+      DARKNESS_FALLS: "YES"
       DARKNESS_FALLS_UPDATE: "NO"  # 毎回起動時に更新する場合 YES
-      # DARKNESS_FALLS_URL: "False" # 特定バージョンを使う場合のみgit URL指定
+      # VERSION=v1.4 ならDFスクリプトが自動でV6のURLを選ぶが、念のため明示
+      DARKNESS_FALLS_URL: "https://dev.azure.com/KhaineUK/_git/Darkness%20Falls%20V6"
 
       # ---- 便利機能 ----
       ALLOC_FIXES: "YES"           # Web管理(Allocs Fixes)を自動インストール
       ALLOC_FIXES_UPDATE: "NO"
+
+      # ---- 管理機能 ----
       BACKUP: "YES"                # 毎日5時に自動バックアップ
       BACKUP_HOUR: "5"
       BACKUP_MAX: "7"              # 最大7個保持
       MONITOR: "YES"               # クラッシュ時の自動再起動
-      UPDATE_MODS: "NO"            # XXX_UPDATE=YES のMODを更新する場合 YES
 
     ports:
       # ゲーム接続用（ポート開放が必要）

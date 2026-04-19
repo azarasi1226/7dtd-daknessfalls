@@ -3,6 +3,17 @@
 [vinanrra/7dtd-server](https://github.com/vinanrra/Docker-7DaysToDie)（LinuxGSMベース）を使って、
 Docker で7DTDサーバー + Darkness Falls を動かす構成です。
 
+## 🔒 バージョン固定ポリシー
+
+| 項目 | バージョン |
+|---|---|
+| 7 Days to Die 本体 | **v1.4 Stable**（Steamブランチ `v1.4` 固定） |
+| Darkness Falls | **V6**（Azure Reposから直接取得） |
+
+7DTD は現在 2.6 まで出ていますが、**DF V6 は 1.4 専用** のため、
+`docker-compose.yml` で `VERSION: "v1.4"` を指定して1.4に固定しています。
+`stable` / `public` にすると2.6が降ってきて DF が動かなくなります。
+
 ## 📁 ディレクトリ構成
 
 ```
@@ -10,12 +21,14 @@ Docker で7DTDサーバー + Darkness Falls を動かす構成です。
 ├── docker-compose.yml       # 起動設定（ここを編集）
 ├── README.md
 ├── config/
-│   └── serverconfig.xml     # サーバー設定のリファレンス（後述）
-├── serverfiles/             # 7DTD本体 + MOD（自動配置）
+│   └── serverconfig.xml     # サーバー設定のリファレンス（参考用）
+├── serverfiles/             # 7DTD本体 + MOD（初回起動時に自動配置）
+│   └── sdtdserver.xml       # 実際のサーバー設定（ここを編集）
 ├── savedata/                # セーブデータ・生成ワールド
-├── lgsm-config/             # LinuxGSM設定
-├── backups/                 # 自動バックアップ保存先
-└── logs/                    # ログ
+├── lgsm-config/             # LinuxGSM設定（Discord通知等、任意）
+│   └── sdtdserver.cfg       # アラート・バックアップ詳細設定
+├── backups/                 # 自動バックアップ保存先（毎日5時）
+└── logs/                    # サーバーログ
 ```
 
 **すべてのデータは 7dtd-docker フォルダ内に完結** します。
@@ -92,9 +105,7 @@ docker exec -it 7dtd-server bash
 # LinuxGSMコマンドを使う（コンテナ内で）
 ./sdtdserver details     # サーバー情報
 ./sdtdserver backup      # 手動バックアップ
-./sdtdserver update      # 7DTD本体の更新
-./sdtdserver mods-update # MODの更新
-./sdtdserver console     # サーバーコンソール
+./sdtdserver console     # サーバーコンソール（Ctrl+B→Dで抜ける）
 
 # telnet経由でサーバーコンソールに入る（ローカルから）
 telnet 127.0.0.1 8081
@@ -102,6 +113,16 @@ telnet 127.0.0.1 8081
 # Web管理パネル（Alloc Fixes）
 # ブラウザで http://127.0.0.1:8080 を開く
 ```
+
+### ⚠️ 使ってはいけないコマンド
+
+```bash
+./sdtdserver update      # 7DTD本体をSteamの最新(2.6)に更新してしまう → DF V6が動かなくなる
+./sdtdserver mods-update # DFも最新に更新される可能性 → 要検証
+```
+
+バージョンは `docker-compose.yml` の `VERSION: "v1.4"` で固定しているので、
+上記コマンドは実行しないでください。
 
 ## 📦 追加MODを入れたい場合
 
@@ -112,6 +133,28 @@ MODファイルを `serverfiles/Mods/` に直接配置するか、
 environment:
   MODS_URLS: "https://example.com/mod1.zip,https://example.com/mod2.zip"
 ```
+
+## 📣 LinuxGSM 追加設定（任意）
+
+`lgsm-config/sdtdserver.cfg` を作成・編集することで、Discord通知やバックアップ詳細など
+を設定できます（初回起動後に自動生成されるのでそれを編集）。
+
+### Discord通知の例
+
+```bash
+# lgsm-config/sdtdserver.cfg
+discordalert="on"
+discordwebhook="https://discord.com/api/webhooks/xxxxx"
+statusalert="on"     # 起動・停止・クラッシュ時の通知
+postalert="on"       # 詳細情報も含める
+```
+
+他にも Email / Slack / Telegram / Gotify / Pushover / Pushbullet / IFTTT / Rocket.Chat
+のアラート、バックアップ保持日数、ログ保持日数などが設定できます。
+全項目は [LinuxGSM公式ドキュメント](https://docs.linuxgsm.com/configuration/game-server-config) を参照。
+
+**注意:** `updateonstart="on"` にすると起動時に7DTDが自動更新されて2.6に上がってしまうので、
+**`off`のまま**（デフォルト）にしておいてください。
 
 ## ⚠️ 注意事項
 
