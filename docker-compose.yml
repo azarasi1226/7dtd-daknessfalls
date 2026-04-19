@@ -31,19 +31,20 @@ services:
       PGID: "1000"
       TimeZone: "Asia/Tokyo"
 
-      # ---- Darkness Falls (v6)----
+      # ---- Darkness Falls ----
       # ※v1.4を選択していれば自動的にv6が選択される 
-      UPDATE_MODS: "NO"            # XXX_UPDATE=YES のMODを更新する場合 YES
-      DARKNESS_FALLS: "YES"
-      DARKNESS_FALLS_UPDATE: "NO"  # 毎回起動時に更新する場合 YES
+      UPDATE_MODS: "NO"            # MODの自動更新
+      DARKNESS_FALLS: "YES"        # Darkness Falls
+      DARKNESS_FALLS_UPDATE: "NO"  # Dakrness Fallsの自動更新
 
       # ---- 便利機能 ----
-      ALLOC_FIXES: "YES"           # Web管理(Allocs Fixes)を自動インストール
+      # Web上からいろいろ管理できるAdminの便利ツール
+      ALLOC_FIXES: "YES"           
       ALLOC_FIXES_UPDATE: "NO"
 
       # ---- 管理機能 ----
-      BACKUP: "YES"                # 毎日5時に自動バックアップ
-      BACKUP_HOUR: "5"
+      BACKUP: "YES"                # バックアップの有効か
+      BACKUP_HOUR: "5"             # 毎日5時に自動バックアップ
       BACKUP_MAX: "7"              # 最大7個保持
       MONITOR: "YES"               # クラッシュ時の自動再起動
 
@@ -54,25 +55,21 @@ services:
       - "26901:26901/udp"
       - "26902:26902/udp"
       # 管理用（ローカルからのみアクセス）
-      - "127.0.0.1:8080:8080/tcp"  # Web管理
-      - "127.0.0.1:8081:8081/tcp"  # telnet管理
-      - "127.0.0.1:8082:8082/tcp"  # Allocs マップGUI
+      - "127.0.0.1:8080:4040/tcp"  # Web管理
+      - "127.0.0.1:8081:4041/tcp"  # telnet管理
+      - "127.0.0.1:8082:4042/tcp"  # Allocs マップGUI
 
     volumes:
-      # セーブデータ・生成ワールド
-      - ./savedata:/home/sdtdserver/.local/share/7DaysToDie
-
       # サーバー本体ファイル（MODもここに自動配置される）
       # serverfiles/Mods/ に追加MODを手動で入れることも可能
       # serverfiles/sdtdserver.xml でサーバー設定を編集
       - ./serverfiles:/home/sdtdserver/serverfiles
-
+      # セーブデータ・生成ワールド
+      - ./savedata:/home/sdtdserver/.local/share/7DaysToDie
       # LinuxGSM の設定（common.cfg など）
       - ./lgsm-config:/home/sdtdserver/lgsm/config-lgsm/sdtdserver
-
       # 自動バックアップの保存先
       - ./backups:/home/sdtdserver/lgsm/backup
-
       # ログ
       - ./logs:/home/sdtdserver/log
 
@@ -81,10 +78,3 @@ services:
       nofile:
         soft: 10240
         hard: 10240
-
-    # ソロ〜2-3人ならこれで十分（8〜12GB推奨、最低8GB）
-    mem_limit: 10g
-    mem_reservation: 6g
-
-    stdin_open: true
-    tty: true
