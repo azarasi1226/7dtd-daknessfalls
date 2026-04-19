@@ -37,11 +37,6 @@ services:
       DARKNESS_FALLS: "YES"        # Darkness Falls
       DARKNESS_FALLS_UPDATE: "NO"  # Dakrness Fallsの自動更新
 
-      # ---- 便利機能 ----
-      # Web上からいろいろ管理できるAdminの便利ツール
-      ALLOC_FIXES: "YES"           
-      ALLOC_FIXES_UPDATE: "NO"
-
       # ---- 管理機能 ----
       BACKUP: "YES"                # バックアップの有効か
       BACKUP_HOUR: "5"             # 毎日5時に自動バックアップ
@@ -54,10 +49,9 @@ services:
       - "26900:26900/udp"
       - "26901:26901/udp"
       - "26902:26902/udp"
-      # 管理用（ローカルからのみアクセス）
-      - "127.0.0.1:8080:4040/tcp"  # Web管理
-      - "127.0.0.1:8081:4041/tcp"  # telnet管理
-      - "127.0.0.1:8082:4042/tcp"  # Allocs マップGUI
+      # telnet管理（ローカルからのみアクセス）
+      # docker exec でも代替可。不要なら削除してOK
+      - "127.0.0.1:8081:8081/tcp"
 
     volumes:
       # サーバー本体ファイル（MODもここに自動配置される）
