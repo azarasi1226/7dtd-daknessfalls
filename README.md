@@ -1,107 +1,125 @@
 # 7 Days to Die Dedicated Server (Docker) + Darkness Falls
 
-ソロ〜2-3人向けの、Dockerで動かす7DTDサーバーです。
-Darkness Falls などの大型Modも簡単に導入できます。
+[vinanrra/7dtd-server](https://github.com/vinanrra/Docker-7DaysToDie)（LinuxGSMベース）を使って、
+Docker で7DTDサーバー + Darkness Falls を動かす構成です。
 
 ## 📁 ディレクトリ構成
 
 ```
 7dtd-docker/
-├── Dockerfile               # サーバー用イメージの定義
-├── docker-compose.yml       # 起動設定
-├── entrypoint.sh            # コンテナ起動時の処理
+├── docker-compose.yml       # 起動設定（ここを編集）
+├── README.md
 ├── config/
-│   └── serverconfig.xml     # サーバー設定（編集してください）
-├── mods/                    # Modを入れる場所（Darkness Falls等）
-│   └── README.md
-├── serverdata/              # SteamCMDがDLしたサーバー本体（自動生成）
-├── savedata/                # セーブデータ・生成ワールド（自動生成）
-├── unity-config/            # Unity設定（PlayerPrefs等、自動生成）
-└── steamcmd/                # SteamCMD状態（自動生成）
+│   └── serverconfig.xml     # サーバー設定のリファレンス（後述）
+├── serverfiles/             # 7DTD本体 + MOD（自動配置）
+├── savedata/                # セーブデータ・生成ワールド
+├── lgsm-config/             # LinuxGSM設定
+├── backups/                 # 自動バックアップ保存先
+└── logs/                    # ログ
 ```
 
-すべてのデータは **このフォルダ内に完結** します。フォルダごと別PCにコピーすればサーバー状態をそのまま移設できます。
+**すべてのデータは 7dtd-docker フォルダ内に完結** します。
+フォルダごと別PCにコピーすればサーバー状態をそのまま移設可能です。
 
 ## 🚀 使い方
 
 ### 1. 事前準備
-- Docker Desktop（Windows/Mac）または Docker Engine + Compose（Linux）をインストール
-- 空きディスク容量 **20GB以上**（7DTD本体5GB + DF 6GB + セーブ等）
-- RAM **8GB以上**推奨（ソロなら6GBでも動く）
+- Docker Desktop（Windows/Mac）または Docker Engine + Compose（Linux）
+- 空きディスク容量 **20GB以上**
+- RAM **8GB以上**推奨
 
-### 2. Modの配置
-Darkness Falls のZIPを解凍し、中の `Mods` フォルダの **中身** を
-プロジェクトの `mods/` フォルダに配置してください。
-詳細は `mods/README.md` を参照。
-
-### 3. 設定の編集
-`config/serverconfig.xml` を開いて以下を変更：
-
-- `ServerName` … サーバー名
-- `ServerPassword` … 参加パスワード（必ず変えてください）
-- `TelnetPassword` … 管理用パスワード
-- `GameWorld` … 使用マップ（DFalls-Medium1 など）
-
-### 4. 起動
+### 2. 初回起動
 
 ```bash
-# イメージをビルドして起動（初回は10-20分かかります）
-docker compose up -d --build
+docker compose up -d
 
-# ログを見る（初回はSteamCMDのDLとワールド生成で時間がかかる）
+# ログを見る（初回はSteamCMDのDLとDFインストールで10-20分かかる）
 docker compose logs -f
 
-# 起動完了の目印（このログが出たら接続可能）:
+# 起動完了の目印:
 # INF [Steamworks.NET] GameServer.LogOn successful
 ```
 
-### 5. 停止・再起動
+`DARKNESS_FALLS: "YES"` により、自動で Darkness Falls がインストールされます。
+`ALLOC_FIXES: "YES"` により、Web管理用の Alloc Fixes も自動で入ります。
+
+### 3. サーバー設定の編集
+
+初回起動後、`serverfiles/sdtdserver.xml` が生成されます。
+これを編集してから再起動してください：
 
 ```bash
-# 停止（セーブデータは残る）
+# 停止
 docker compose down
 
-# 再起動
-docker compose restart
+# serverfiles/sdtdserver.xml を編集（下記項目を参照）
 
-# 2回目以降の起動を高速化したい場合:
-# docker-compose.yml の SKIP_UPDATE を "1" に変える
+# 再起動
+docker compose up -d
 ```
 
-## 🎮 クライアント（プレイヤー）側の準備
+**最低限変更すべき項目**（`config/serverconfig.xml` も参考用に置いてあります）：
+
+- `ServerName` … サーバー名
+- `ServerPassword` … 参加パスワード（必ず変更）
+- `TelnetPassword` … 管理用パスワード
+- `ControlPanelPassword` … Web管理パスワード
+- `GameWorld` … `DFalls-Medium1` など（DF付属マップ）
+- `EACEnabled` … **必ず `false`**（DF利用時）
+
+### 4. 停止・再起動
+
+```bash
+docker compose down       # 停止（セーブデータは残る）
+docker compose restart    # 再起動
+docker compose logs -f    # ログ監視
+```
+
+## 🎮 クライアント（プレイヤー）側
 
 **重要：** Darkness Falls を使う場合、**プレイヤー全員** がクライアントにも DF を入れる必要があります。
 
-1. 7D2D Mod Launcher を使うのが一番ラク
-   - https://7d2dmodlauncher.org/
+1. [7D2D Mod Launcher](https://7d2dmodlauncher.org/) を使うのが一番ラク
 2. Darkness Falls を選んで Install → Play
 3. サーバーのIP・ポート・パスワードを入れて接続
 
 ## 🔧 便利なコマンド
 
 ```bash
-# サーバーコンソールに入る（telnet経由）
-docker exec -it 7dtd-server telnet localhost 8081
-
-# コンテナの中に入って直接確認
+# コンテナに入る
 docker exec -it 7dtd-server bash
 
-# サーバー本体を手動で更新したい時
-docker compose down
-docker compose up -d   # SKIP_UPDATE=0 の状態で起動すればOK
+# LinuxGSMコマンドを使う（コンテナ内で）
+./sdtdserver details     # サーバー情報
+./sdtdserver backup      # 手動バックアップ
+./sdtdserver update      # 7DTD本体の更新
+./sdtdserver mods-update # MODの更新
+./sdtdserver console     # サーバーコンソール
 
-# セーブデータのバックアップ
-cp -r savedata savedata.backup.$(date +%Y%m%d)
+# telnet経由でサーバーコンソールに入る（ローカルから）
+telnet 127.0.0.1 8081
+
+# Web管理パネル（Alloc Fixes）
+# ブラウザで http://127.0.0.1:8080 を開く
+```
+
+## 📦 追加MODを入れたい場合
+
+MODファイルを `serverfiles/Mods/` に直接配置するか、
+`docker-compose.yml` の環境変数で URL 指定できます：
+
+```yaml
+environment:
+  MODS_URLS: "https://example.com/mod1.zip,https://example.com/mod2.zip"
 ```
 
 ## ⚠️ 注意事項
 
 - **EAC（Easy Anti-Cheat）は必ず無効化** します（DFが動かないため）
 - Modを変更した場合、**既存のセーブと互換性がない**ことがあります
-- 初回起動時はワールド生成に **10-20分** かかることがあります
 - ポート `26900` をルーターで **ポート開放**（TCP/UDP両方）する必要があります
-- Telnet/Web管理ポート（8081/8080）は `127.0.0.1` にバインドしているので、
-  外部からは見えません。必要なら `docker-compose.yml` で調整してください。
+- 管理ポート（8080/8081/8082）は `127.0.0.1` にバインドしているので、
+  外部からは見えません
 
 ## 💾 RAM見積り（参考）
 
@@ -113,6 +131,7 @@ cp -r savedata savedata.backup.$(date +%Y%m%d)
 
 ## 📚 参考リンク
 
-- 公式サーバーWiki: https://community.7daystodie.com/
-- Darkness Falls: https://7daystodiemods.com/darkness-falls-mod/
-- 7D2D Mod Launcher: https://7d2dmodlauncher.org/
+- [vinanrra/Docker-7DaysToDie](https://github.com/vinanrra/Docker-7DaysToDie) - 使用イメージ
+- [LinuxGSM 7DTD](https://docs.linuxgsm.com/game-servers/7-days-to-die) - 管理コマンド
+- [Darkness Falls 公式](https://community.7daystodie.com/topic/4941-darkness-falls-they-mostly-come-out-at-night/)
+- [7D2D Mod Launcher](https://7d2dmodlauncher.org/) - クライアント側

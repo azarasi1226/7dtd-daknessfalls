@@ -1,59 +1,84 @@
 # ================================================
 # 7 Days to Die + Darkness Falls - Docker Compose
+# ベースイメージ: vinanrra/7dtd-server (LinuxGSM)
 # ================================================
+# 特徴:
+#   - Darkness Falls を環境変数で自動インストール
+#   - 自動バックアップ・クラッシュ時の自動再起動
+#   - Alloc Fixes（Web管理）も自動インストール
+#   - 全データを 7dtd-docker フォルダ内に永続化
 # 使い方:
-#   1. mods/ フォルダに Darkness Falls のMODファイルを入れる
-#      （DFのzipを解凍して、中の "Mods" フォルダの中身を入れる）
-#   2. docker compose up -d で起動
-#   3. docker compose logs -f で進捗確認
+#   1. docker compose up -d  （初回は10〜20分かかる）
+#   2. docker compose logs -f で進捗確認
+#   3. 起動後、serverfiles/sdtdserver.xml を編集してサーバー設定
 # ================================================
 
 services:
   7dtd:
-    build: .
-    image: my7dtd:df
+    image: vinanrra/7dtd-server:latest
     container_name: 7dtd-server
     restart: unless-stopped
 
     environment:
-      # サーバー更新をスキップしたい時は 1 にする（2回目以降の起動高速化）
-      SKIP_UPDATE: "0"
-      TZ: "Asia/Tokyo"
+      # ---- 必須 ----
+      START_MODE: "1"              # 1=通常起動, 4=shell起動（メンテ用）
+      VERSION: "stable"            # 7DTD本体バージョン（stable=1.4想定）
+      PUID: "1000"
+      PGID: "1000"
+      TimeZone: "Asia/Tokyo"
+
+      # ---- Darkness Falls ----
+      DARKNESS_FALLS: "YES"        # DFを自動インストール
+      DARKNESS_FALLS_UPDATE: "NO"  # 毎回起動時に更新する場合 YES
+      # DARKNESS_FALLS_URL: "False" # 特定バージョンを使う場合のみgit URL指定
+
+      # ---- 便利機能 ----
+      ALLOC_FIXES: "YES"           # Web管理(Allocs Fixes)を自動インストール
+      ALLOC_FIXES_UPDATE: "NO"
+      BACKUP: "YES"                # 毎日5時に自動バックアップ
+      BACKUP_HOUR: "5"
+      BACKUP_MAX: "7"              # 最大7個保持
+      MONITOR: "YES"               # クラッシュ時の自動再起動
+      UPDATE_MODS: "NO"            # XXX_UPDATE=YES のMODを更新する場合 YES
 
     ports:
-      # ゲーム接続用
+      # ゲーム接続用（ポート開放が必要）
       - "26900:26900/tcp"
       - "26900:26900/udp"
       - "26901:26901/udp"
       - "26902:26902/udp"
-      # 管理用（必要な場合のみ公開、外部に出さないのが安全）
-      - "127.0.0.1:8081:8081/tcp"   # telnet管理（ローカルのみ）
-      - "127.0.0.1:8080:8080/tcp"   # Allocs Web管理（ローカルのみ）
+      # 管理用（ローカルからのみアクセス）
+      - "127.0.0.1:8080:8080/tcp"  # Web管理
+      - "127.0.0.1:8081:8081/tcp"  # telnet管理
+      - "127.0.0.1:8082:8082/tcp"  # Allocs マップGUI
 
     volumes:
-      # サーバーの本体ファイル（SteamCMDダウンロード先）
-      # ここを永続化するとサーバー更新が速くなる
-      - ./serverdata:/home/steam/7dtd
+      # セーブデータ・生成ワールド
+      - ./savedata:/home/sdtdserver/.local/share/7DaysToDie
 
-      # セーブデータ・生成ワールドなど
-      - ./savedata:/home/steam/.local/share/7DaysToDie
+      # サーバー本体ファイル（MODもここに自動配置される）
+      # serverfiles/Mods/ に追加MODを手動で入れることも可能
+      # serverfiles/sdtdserver.xml でサーバー設定を編集
+      - ./serverfiles:/home/sdtdserver/serverfiles
 
-      # Unity の設定ファイル（PlayerPrefs等）も永続化
-      - ./unity-config:/home/steam/.config/unity3d
+      # LinuxGSM の設定（common.cfg など）
+      - ./lgsm-config:/home/sdtdserver/lgsm/config-lgsm/sdtdserver
 
-      # SteamCMD の状態（ログイン情報・キャッシュ）
-      - ./steamcmd:/home/steam/Steam
+      # 自動バックアップの保存先
+      - ./backups:/home/sdtdserver/lgsm/backup
 
-      # Darkness Falls などのModファイル（読み取り専用）
-      - ./mods:/home/steam/mods:ro
+      # ログ
+      - ./logs:/home/sdtdserver/log
 
-      # serverconfig.xml を外から差し替え（読み取り専用）
-      - ./config:/home/steam/config:ro
+    # LinuxGSMの推奨設定
+    ulimits:
+      nofile:
+        soft: 10240
+        hard: 10240
 
     # ソロ〜2-3人ならこれで十分（8〜12GB推奨、最低8GB）
     mem_limit: 10g
     mem_reservation: 6g
 
-    # stdinを開けておくと docker attach で操作しやすい
     stdin_open: true
     tty: true
