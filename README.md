@@ -20,8 +20,6 @@ Docker で7DTDサーバー + Darkness Falls を動かす構成です。
 7dtd-docker/
 ├── docker-compose.yml       # 起動設定（ここを編集）
 ├── README.md
-├── config/
-│   └── serverconfig.xml     # サーバー設定のリファレンス（参考用）
 ├── serverfiles/             # 7DTD本体 + MOD（初回起動時に自動配置）
 │   └── sdtdserver.xml       # 実際のサーバー設定（ここを編集）
 ├── savedata/                # セーブデータ・生成ワールド
@@ -71,7 +69,7 @@ docker compose down
 docker compose up -d
 ```
 
-**最低限変更すべき項目**（`config/serverconfig.xml` も参考用に置いてあります）：
+**最低限変更すべき項目**：
 
 - `ServerName` … サーバー名
 - `ServerPassword` … 参加パスワード（必ず変更）

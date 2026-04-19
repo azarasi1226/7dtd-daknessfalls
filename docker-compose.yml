@@ -32,11 +32,10 @@ services:
       TimeZone: "Asia/Tokyo"
 
       # ---- Darkness Falls (v6)----
+      # ※v1.4を選択していれば自動的にv6が選択される 
       UPDATE_MODS: "NO"            # XXX_UPDATE=YES のMODを更新する場合 YES
       DARKNESS_FALLS: "YES"
       DARKNESS_FALLS_UPDATE: "NO"  # 毎回起動時に更新する場合 YES
-      # VERSION=v1.4 ならDFスクリプトが自動でV6のURLを選ぶが、念のため明示
-      DARKNESS_FALLS_URL: "https://dev.azure.com/KhaineUK/_git/Darkness%20Falls%20V6"
 
       # ---- 便利機能 ----
       ALLOC_FIXES: "YES"           # Web管理(Allocs Fixes)を自動インストール
