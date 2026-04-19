@@ -1,0 +1,18 @@
+# 自動生成されるデータは除外（.gitkeep だけ残す）
+serverdata/*
+!serverdata/.gitkeep
+savedata/*
+!savedata/.gitkeep
+unity-config/*
+!unity-config/.gitkeep
+steamcmd/*
+!steamcmd/.gitkeep
+
+# Mods本体はサイズが大きいので除外（README以外）
+mods/*
+!mods/README.md
+!mods/.gitkeep
+
+# ローカル環境のファイル
+.env
+*.log

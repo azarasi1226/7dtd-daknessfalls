@@ -1,0 +1,59 @@
+# ================================================
+# 7 Days to Die + Darkness Falls - Docker Compose
+# ================================================
+# 使い方:
+#   1. mods/ フォルダに Darkness Falls のMODファイルを入れる
+#      （DFのzipを解凍して、中の "Mods" フォルダの中身を入れる）
+#   2. docker compose up -d で起動
+#   3. docker compose logs -f で進捗確認
+# ================================================
+
+services:
+  7dtd:
+    build: .
+    image: my7dtd:df
+    container_name: 7dtd-server
+    restart: unless-stopped
+
+    environment:
+      # サーバー更新をスキップしたい時は 1 にする（2回目以降の起動高速化）
+      SKIP_UPDATE: "0"
+      TZ: "Asia/Tokyo"
+
+    ports:
+      # ゲーム接続用
+      - "26900:26900/tcp"
+      - "26900:26900/udp"
+      - "26901:26901/udp"
+      - "26902:26902/udp"
+      # 管理用（必要な場合のみ公開、外部に出さないのが安全）
+      - "127.0.0.1:8081:8081/tcp"   # telnet管理（ローカルのみ）
+      - "127.0.0.1:8080:8080/tcp"   # Allocs Web管理（ローカルのみ）
+
+    volumes:
+      # サーバーの本体ファイル（SteamCMDダウンロード先）
+      # ここを永続化するとサーバー更新が速くなる
+      - ./serverdata:/home/steam/7dtd
+
+      # セーブデータ・生成ワールドなど
+      - ./savedata:/home/steam/.local/share/7DaysToDie
+
+      # Unity の設定ファイル（PlayerPrefs等）も永続化
+      - ./unity-config:/home/steam/.config/unity3d
+
+      # SteamCMD の状態（ログイン情報・キャッシュ）
+      - ./steamcmd:/home/steam/Steam
+
+      # Darkness Falls などのModファイル（読み取り専用）
+      - ./mods:/home/steam/mods:ro
+
+      # serverconfig.xml を外から差し替え（読み取り専用）
+      - ./config:/home/steam/config:ro
+
+    # ソロ〜2-3人ならこれで十分（8〜12GB推奨、最低8GB）
+    mem_limit: 10g
+    mem_reservation: 6g
+
+    # stdinを開けておくと docker attach で操作しやすい
+    stdin_open: true
+    tty: true

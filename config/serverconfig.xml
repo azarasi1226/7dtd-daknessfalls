@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!--
+  Darkness Falls 用 serverconfig.xml サンプル（ソロ〜2-3人向け）
+  - EAC は必ず false（DFはバニラファイルを書き換えるため）
+  - GameWorld は DF付属のマップ名に合わせる
+  - GameName は任意（セーブフォルダ名になる）
+-->
+<ServerSettings>
+
+  <!-- ====== 基本情報 ====== -->
+  <property name="ServerName"                value="My Darkness Falls Server"/>
+  <property name="ServerDescription"         value="DF survival - friends only"/>
+  <property name="ServerWebsiteURL"          value=""/>
+  <property name="ServerPassword"            value="changeme"/>
+  <property name="ServerLoginConfirmationText" value=""/>
+  <property name="Region"                    value="Japan"/>
+  <property name="Language"                  value="Japanese"/>
+
+  <!-- ====== ネットワーク ====== -->
+  <property name="ServerPort"                value="26900"/>
+  <property name="ServerVisibility"          value="1"/>   <!-- 1=フレンドのみ / 2=公開 -->
+  <property name="ServerDisabledNetworkProtocols" value="SteamNetworking"/>
+  <property name="ServerMaxWorldTransferSpeedKiBs" value="512"/>
+
+  <!-- ====== プレイヤー ====== -->
+  <property name="ServerMaxPlayerCount"      value="4"/>
+  <property name="ServerReservedSlots"       value="0"/>
+  <property name="ServerReservedSlotsPermission" value="100"/>
+  <property name="ServerAdminSlots"          value="0"/>
+  <property name="ServerAdminSlotsPermission" value="0"/>
+
+  <!-- ====== 管理 ====== -->
+  <property name="EACEnabled"                value="false"/>  <!-- DF利用時は必ず false -->
+  <property name="HideCommandExecutionLog"   value="0"/>
+  <property name="MaxUncoveredMapChunksPerPlayer" value="131072"/>
+  <property name="PersistentPlayerProfiles"  value="false"/>
+
+  <!-- ====== Telnet（リモート管理） ====== -->
+  <property name="TelnetEnabled"             value="true"/>
+  <property name="TelnetPort"                value="8081"/>
+  <property name="TelnetPassword"            value="telnet-changeme"/>
+  <property name="TelnetFailedLoginLimit"    value="10"/>
+  <property name="TelnetFailedLoginsBlocktime" value="10"/>
+
+  <!-- ====== Web管理（Allocs MOD） ====== -->
+  <property name="ControlPanelEnabled"       value="false"/>
+  <property name="ControlPanelPort"          value="8080"/>
+  <property name="ControlPanelPassword"      value="web-changeme"/>
+
+  <!-- ====== ワールド設定（Darkness Falls用） ====== -->
+  <!--
+    DFに同梱されているプリメイドマップを使う場合:
+      DFalls-Medium1, DFalls-Medium2, DFalls-Large1, DFalls-Large2, DFalls-Huge1 など
+    RWG（ランダム生成）を使う場合:  GameWorld="RWG"
+  -->
+  <property name="GameWorld"                 value="DFalls-Medium1"/>
+  <property name="WorldGenSeed"              value="ShinzanMySeed"/>
+  <property name="WorldGenSize"              value="8192"/>
+  <property name="GameName"                  value="MyDFWorld"/>
+  <property name="GameMode"                  value="GameModeSurvival"/>
+
+  <!-- ====== 難易度・ゲームプレイ ====== -->
+  <property name="GameDifficulty"            value="2"/>   <!-- 0=Scavenger 〜 5=Insane -->
+  <property name="BlockDamagePlayer"         value="100"/>
+  <property name="BlockDamageAI"             value="100"/>
+  <property name="BlockDamageAIBM"           value="100"/>
+  <property name="XPMultiplier"              value="100"/>
+  <property name="PlayerSafeZoneLevel"       value="5"/>
+  <property name="PlayerSafeZoneHours"       value="5"/>
+
+  <property name="BuildCreate"               value="false"/>
+  <property name="DayNightLength"            value="60"/>
+  <property name="DayLightLength"            value="18"/>
+  <property name="DeathPenalty"              value="1"/>
+  <property name="DropOnDeath"               value="1"/>
+  <property name="DropOnQuit"                value="0"/>
+  <property name="BedrollDeadZoneSize"       value="15"/>
+  <property name="BedrollExpiryTime"         value="45"/>
+
+  <!-- ====== ゾンビ設定 ====== -->
+  <property name="MaxSpawnedZombies"         value="64"/>
+  <property name="MaxSpawnedAnimals"         value="50"/>
+  <property name="EnemySpawnMode"            value="true"/>
+  <property name="EnemyDifficulty"           value="0"/>
+  <property name="ZombieFeralSense"          value="0"/>
+  <property name="ZombieMove"                value="0"/>   <!-- 0=Walk, 3=Run -->
+  <property name="ZombieMoveNight"           value="3"/>
+  <property name="ZombieFeralMove"           value="3"/>
+  <property name="ZombieBMMove"              value="3"/>
+  <property name="BloodMoonFrequency"        value="7"/>
+  <property name="BloodMoonRange"            value="0"/>
+  <property name="BloodMoonWarning"          value="8"/>
+  <property name="BloodMoonEnemyCount"       value="8"/>
+
+  <!-- ====== ルート・その他 ====== -->
+  <property name="LootAbundance"             value="100"/>
+  <property name="LootRespawnDays"           value="30"/>
+  <property name="AirDropFrequency"          value="72"/>
+  <property name="AirDropMarker"             value="true"/>
+  <property name="PartySharedKillRange"      value="100"/>
+
+  <property name="LandClaimCount"            value="1"/>
+  <property name="LandClaimSize"             value="41"/>
+  <property name="LandClaimDeadZone"         value="30"/>
+  <property name="LandClaimExpiryTime"       value="7"/>
+  <property name="LandClaimDecayMode"        value="0"/>
+  <property name="LandClaimOnlineDurabilityModifier"  value="4"/>
+  <property name="LandClaimOfflineDurabilityModifier" value="4"/>
+  <property name="LandClaimOfflineDelay"     value="0"/>
+
+  <property name="TwitchServerPermission"    value="90"/>
+  <property name="TwitchBloodMoonAllowed"    value="false"/>
+
+  <property name="SaveDataLimit"             value="-1"/>
+  <property name="SaveGameFolder"            value=""/>
+  <property name="UserDataFolder"            value=""/>
+
+</ServerSettings>
