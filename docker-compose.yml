@@ -2,16 +2,6 @@
 # 7 Days to Die + Darkness Falls - Docker Compose
 # ベースイメージ: vinanrra/7dtd-server (LinuxGSM)
 # ================================================
-# 特徴:
-#   - Darkness Falls を環境変数で自動インストール
-#   - 自動バックアップ・クラッシュ時の自動再起動
-#   - Alloc Fixes（Web管理）も自動インストール
-#   - 全データを 7dtd-docker フォルダ内に永続化
-# 使い方:
-#   1. docker compose up -d  （初回は10〜20分かかる）
-#   2. docker compose logs -f で進捗確認
-#   3. 起動後、serverfiles/sdtdserver.xml を編集してサーバー設定
-# ================================================
 
 services:
   7dtd:
@@ -35,10 +25,10 @@ services:
       # ※v1.4を選択していれば自動的にv6が選択される 
       UPDATE_MODS: "NO"            # MODの自動更新
       DARKNESS_FALLS: "YES"        # Darkness Falls
-      DARKNESS_FALLS_UPDATE: "NO"  # Dakrness Fallsの自動更新
+      DARKNESS_FALLS_UPDATE: "NO"  # Darkness Fallsの自動更新
 
       # ---- 管理機能 ----
-      BACKUP: "YES"                # バックアップの有効か
+      BACKUP: "YES"                # バックアップの有効化
       BACKUP_HOUR: "5"             # 毎日5時に自動バックアップ
       BACKUP_MAX: "7"              # 最大7個保持
       MONITOR: "YES"               # クラッシュ時の自動再起動
@@ -66,6 +56,9 @@ services:
       - ./backups:/home/sdtdserver/lgsm/backup
       # ログ
       - ./logs:/home/sdtdserver/log
+      # サーバー設定ファイル（git管理）。read-only で上書き保護
+      # 設定変更は config/sdtdserver.xml を編集 → 再起動
+      - ./config/sdtdserver.xml:/home/sdtdserver/serverfiles/sdtdserver.xml:ro
 
     # LinuxGSMの推奨設定
     ulimits:

@@ -1,15 +1,6 @@
-# 自動生成されるデータは除外（.gitkeep だけ残す）
+# 自動生成される環境依存データは除外
 savedata/*
-!savedata/.gitkeep
 serverfiles/*
-!serverfiles/.gitkeep
 lgsm-config/*
-!lgsm-config/.gitkeep
 backups/*
-!backups/.gitkeep
 logs/*
-!logs/.gitkeep
-
-# ローカル環境のファイル
-.env
-*.log
