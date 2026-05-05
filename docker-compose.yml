@@ -56,9 +56,8 @@ services:
       - ./backups:/home/sdtdserver/lgsm/backup
       # ログ
       - ./logs:/home/sdtdserver/log
-      # サーバー設定ファイル（git管理）。read-only で上書き保護
-      # 設定変更は config/sdtdserver.xml を編集 → 再起動
-      - ./config/sdtdserver.xml:/home/sdtdserver/serverfiles/sdtdserver.xml:ro
+      # 7dtdサーバー設定ファイル（git管理)
+      - ./config/sdtdserver.xml:/home/sdtdserver/serverfiles/sdtdserver.xml
 
     # LinuxGSMの推奨設定
     ulimits:
