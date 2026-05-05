@@ -1,18 +1,10 @@
-# 7 Days to Die Dedicated Server (Docker) + Darkness Falls
-
-[vinanrra/7dtd-server](https://github.com/vinanrra/Docker-7DaysToDie)（LinuxGSMベース）を使って、
-Docker で7DTDサーバー + Darkness Falls を動かす構成です。
-
-## 🔒 バージョン固定ポリシー
+# 7 Days to Die + Darkness Fallsサーバー構築手順
+## 🔒 クライアントのバージョン指定
 
 | 項目 | バージョン |
 |---|---|
-| 7 Days to Die 本体 | **v1.4 Stable**（Steamブランチ `v1.4` 固定） |
-| Darkness Falls | **V6**（Azure Reposから直接取得） |
-
-7DTD は現在 2.6 まで出ていますが、**DF V6 は 1.4 専用** のため、
-`docker-compose.yml` で `VERSION: "v1.4"` を指定して1.4に固定しています。
-`stable` / `public` にすると2.6が降ってきて DF が動かなくなります。
+| 7 Days to Die 本体 | **v1.4** |
+| Darkness Falls | **V6** |
 
 ## 📁 ディレクトリ構成
 
@@ -20,11 +12,11 @@ Docker で7DTDサーバー + Darkness Falls を動かす構成です。
 7dtd-docker/
 ├── docker-compose.yml       # 起動設定（ここを編集）
 ├── README.md
+├── config/
+│   └── sdtdserver.xml       # サーバー設定ファイル
 ├── serverfiles/             # 7DTD本体 + MOD（初回起動時に自動配置）
-│   └── sdtdserver.xml       # 実際のサーバー設定（ここを編集）
 ├── savedata/                # セーブデータ・生成ワールド
 ├── lgsm-config/             # LinuxGSM設定（Discord通知等、任意）
-│   └── sdtdserver.cfg       # アラート・バックアップ詳細設定
 ├── backups/                 # 自動バックアップ保存先（毎日5時）
 └── logs/                    # サーバーログ
 ```
@@ -51,9 +43,6 @@ docker compose logs -f
 # INF [Steamworks.NET] GameServer.LogOn successful
 ```
 
-`DARKNESS_FALLS: "YES"` により、自動で Darkness Falls がインストールされます。
-`ALLOC_FIXES: "YES"` により、Web管理用の Alloc Fixes も自動で入ります。
-
 ### 3. サーバー設定の編集
 
 初回起動後、`serverfiles/sdtdserver.xml` が生成されます。
@@ -63,7 +52,7 @@ docker compose logs -f
 # 停止
 docker compose down
 
-# serverfiles/sdtdserver.xml を編集（下記項目を参照）
+# config/sdtdserver.xml を編集（下記項目を参照）
 
 # 再起動
 docker compose up -d
